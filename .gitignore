@@ -1,0 +1,9 @@
+*.yaml
+*.yml
+*.env
+.env*
+db/
+node_modules/
+!vendor/
+!package-lock.json
+!package.json

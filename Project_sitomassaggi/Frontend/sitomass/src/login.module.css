@@ -1,0 +1,98 @@
+:root {
+    --spacer-1: 0.5rem;
+    --spacer-2: 1rem;
+    --spacer-3: 1.5rem;
+}
+
+body {
+    margin: 0;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+label.labelForm {
+    padding-left: 0.5rem;
+    display: block;
+    margin-block-start: 0px;
+    margin-block-end: 0.1rem;
+    font-weight: bolder;
+    color: #9DB4C0;
+}
+
+
+
+input {
+    border-radius: 0.2rem;
+    border: 0px solid black;
+    background-color: #5C6B73;
+    padding: 0.3rem var(--spacer-2);
+    width: 100%;
+
+}
+
+input:focus {
+    outline: none;
+}
+
+.box {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background-image: url("./Images/susannp4-background-1524540_1920.jpg");
+    background-position:left;
+
+}
+
+.wrapper {
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 30vmax;
+    height: 30%;
+    background: #2532370e;
+    backdrop-filter: blur(10px);
+    border-radius: 1rem;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+
+
+    box-sizing: border-box;
+    padding-inline: var(--spacer-2);
+    padding-block-start: var(--spacer-2);
+
+}
+
+
+
+.formInputControl {
+    margin-bottom: 0.4rem;
+}
+
+.labelWrapper{
+    position: relative;
+}
+.labelWrapper input{
+    margin-top: 2rem;
+}
+
+.labelWrapper label {
+    position: absolute;
+    top: 0.5rem;
+    left: 0;
+    padding-left: 0.5rem;
+   
+    transition: 0.3s ease-in-out;
+}
+
+.labelWrapper:focus-within label {
+    transform: translateY(1rem);
+    font-size: 0.7rem;
+}

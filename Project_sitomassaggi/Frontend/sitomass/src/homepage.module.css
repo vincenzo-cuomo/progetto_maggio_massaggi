@@ -1,0 +1,154 @@
+@import url('https://fonts.googleapis.com/css2?family=Chau+Philomene+One:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Borel&display=swap');
+
+
+body {
+    display: flex;
+    background-color: #c2cdff;
+    justify-content: center;
+}
+
+p {
+    line-height: 1;
+    display: block;
+    margin-block-start: 0px;
+    margin-block-end: 0px;
+}
+
+ul {
+    padding-inline-start: 0px;
+    margin-block-start: 0;
+    margin-block-end: 0;
+}
+
+
+.mainBG {
+    position: relative;
+    top: 1.5%;
+    border-radius: 2vmax 2vmax 0 0;
+    width: 95vw;
+    min-height: 98dvh;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 1) 4%, rgba(53, 51, 205, 1) 100%);
+
+}
+
+.headerNav {
+    position: relative;
+    top: 1vmax;
+    display: flex;
+    justify-content: end;
+    color: white;
+    list-style: none;
+    gap: 0.5rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    padding-inline: 3%;
+}
+
+a {
+    all: unset;
+}
+
+.li {
+    display: flex;
+    align-items: center;
+    color: rgb(255, 255, 255);
+}
+
+.nameMassaggi {
+    composes: li;
+    font-size: clamp(1.375rem, 2vw + 1rem, 3rem);
+    margin-right: auto;
+}
+
+.loginLi {
+    composes: li;
+    cursor: pointer;
+    font-size: clamp(0.813rem, 1vw + 0.5rem, 1.375rem);
+    align-self: stretch;
+}
+
+.loginLiP{
+    position: relative;
+    box-sizing: border-box;
+    padding: 5px;
+    text-align: center;
+}
+
+.loginLiP::before{
+    position: absolute;
+    z-index: 0;
+    content: '';
+    background: rgba(34, 120, 201, 0.39);
+    bottom: -0.15em;
+    width: 100%;
+    height: 0.1em;
+    left: 0px;
+    transition: all 0.3s ease-in;
+    
+}
+
+.loginLiP:hover::before{
+    
+    height: calc(100% + 0.15em);
+    width: 100%;
+    background: rgba(34, 120, 201, 0.103);
+    border-radius: 0.1em 0.1em 0 0;
+}
+
+.user {
+    composes: li;
+}
+
+.nameHeader {
+    composes: li;
+    font-size: clamp(1.125rem, 1vw + 1rem, 2rem);
+}
+
+.massageContainer {
+    margin-top: 2%;
+    display: grid;
+    max-height: 50vh;
+    grid-template-columns: repeat(auto-fit, minmax(15vmax, 15vmax));
+    padding: 5%;
+}
+
+.massageCard {
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    color: white;
+    aspect-ratio: 1/2;
+    width: 16.5vmax;
+    max-height: 450px;
+    border: 3px solid rgb(255, 255, 255);
+}
+
+.massageName {
+    display: flex;
+    height: 20%;
+    background-color: black;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.5vmax;
+    font-family: sans-serif;
+}
+
+.massageImage {
+    overflow: hidden;
+    height: 80%;
+}
+
+.massageImage img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    transition: 0.5s ease-in;
+}
+
+.massageImage:hover img {
+    background-color: rgba(0, 255, 255, 0);
+    filter: blur(5px);
+    transform: scale(1.05);
+}
