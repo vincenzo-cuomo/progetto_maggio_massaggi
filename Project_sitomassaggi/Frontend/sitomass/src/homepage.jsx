@@ -1,18 +1,12 @@
 import { useEffect, useState } from 'react'
 import styles from './homepage.module.css'
-import img from "./Images/womangettingamassage.webp"
 import { Link } from 'react-router-dom'
 
 function MassageCard({ name, description, img }) {
-
-    const handleMouseEnter = () => {
-        console.log("ciaoo")
-    }
-
     return (
-        <div className={styles.massageCard} onMouseEnter={handleMouseEnter}>
+        <div className={styles.massageCard}>
             <div className={styles.massageName}>{name}</div>
-            <div className={styles.massageImage}><img src={img} alt="" /></div>
+            <div className={styles.massageImage}><img src={img} alt="" /><p>{description}</p></div>
         </div>
     )
 }
@@ -21,7 +15,6 @@ function MassageCard({ name, description, img }) {
 export default function Homepage() {
     const [isLogged, setIsLogged] = useState(false)
     const [username, setUsername] = useState("")
-    const [a, seta] = useState("")
 
 
     async function checkDBJWT() {
@@ -46,6 +39,8 @@ export default function Homepage() {
         fecthData()
     }, [])
 
+
+
     return (
         <>
             <div className={styles.mainBG}>
@@ -60,7 +55,6 @@ export default function Homepage() {
                     </ul>
                 </header>
                 <div className={styles.massageContainer}>
-                    <MassageCard name="LINFODRENANTE" description="bim" img={img} />
                 </div>
             </div >
         </>
