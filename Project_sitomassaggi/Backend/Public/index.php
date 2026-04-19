@@ -1,5 +1,8 @@
 <?php
+
 $path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
+$queries = array();
+parse_str(parse_url($_SERVER["REQUEST_URI"], PHP_URL_QUERY) ?? '', $queries);
 $path = preg_replace('#^.*(/api/)#', '$1', $path);
 $path = trim($path, '/');
 $method = $_SERVER['REQUEST_METHOD'];
@@ -69,9 +72,18 @@ switch ($path) {
         }
         jwtValidator($jwt);
         break;
+    case 'api/massaggi':
+        require __DIR__. "/../API/controllers/getMassaggi.php";
+        break;
+    case 'api/test':
+        echo json_encode([$_SERVER['REQUEST_URI'], parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH)]);
+        break;
+        exit;
     default:
         http_response_code(400);
         header("Content-Type: application/json");
         echo (json_encode(["success" => false, "error" => "Incorrect syntax"]));
         break;
+    
 }
+

@@ -1,24 +1,46 @@
 <?php
 
-function dbConnection()
+
+
+class database extends PDO
 {
-    $serverName = getenv('DB_SERVER');
-    $database =  getenv('DB_NAME');
-    $userName = getenv('DB_USER');
-    $password = getenv('DB_PASSWORD');
 
-    try {
-        $connectionString = "sqlsrv:Server=$serverName;Database=$database;TrustServerCertificate=yes;Encrypt=no;LoginTimeout=3";
-        $db = new PDO($connectionString, $userName, $password);
-        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    private readonly string $serverName;
+    private readonly string $database;
+    private readonly string $username;
+    private readonly string $password;
+    private PDO $conn;
 
-        return $db;
-    } catch (PDOException) {
-        http_response_code(500);
-        echo json_encode([
-            "success" => false,
-            "description" => "Connessione al db fallita"
-        ]);
-        exit;
+    function __construct($trustServerCertificate = true, bool $encrypt = false, int $loginTimeout = 3)
+    {
+        $this->serverName = getenv('DB_SERVER') ?? '';
+        $this->database = getenv('DB_NAME') ?? '';
+        $this->username = getenv('DB_USER') ?? '';
+        $this->password = getenv('DB_PASSWORD') ?? '';
+        $this->conn = $this->dbConnect($trustServerCertificate, $encrypt, $loginTimeout);
+    }
+
+    public function dbConnect($trustServerCertificate = true, bool $encrypt = false, int $loginTimeout = 3)
+    {
+        if (
+            empty($this->serverName) || empty($this->database) || empty($this->username) || empty($this->password)
+        ) {
+            throw new Exception("Variabili DB mancanti");
+            exit;
+        }
+        $trustServerCertificate = $trustServerCertificate ? "yes" : "no";
+        $encrypt = $encrypt ? "yes" : "no";
+        $loginTimeout = (string) $loginTimeout;
+        $connectionString = "sqlsrv:Server=$this->serverName;Database=$this->database;TrustServerCertificate=$trustServerCertificate;Encrypt=$encrypt;LoginTimeout=$loginTimeout";
+        try {
+            $this->connect($connectionString, $this->username, $this->password);
+        } catch (PDOException $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["success" => false, "description" => "Connessione al DB fallita, riprovare più tardi"]);
+            exit;
+        }
+
+        return $this->connect($connectionString, $this->username, $this->password);
     }
 }

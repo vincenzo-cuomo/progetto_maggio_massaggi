@@ -3,8 +3,8 @@ function signup($name, $age, $tel, $email, $pass)
 {
     require __DIR__ . "/../models/conf.php";
     $pass = htmlspecialchars($pass);
-    $db = dbConnection();
-    if (!$db) {
+    $db = new database();
+    if (!$db->dbConnect()) {
         http_response_code(500);
         header("Content-Type: application/json");
         echo json_encode([
@@ -13,6 +13,7 @@ function signup($name, $age, $tel, $email, $pass)
         ]);
         exit;
     }
+    $db = $db ->dbConnect();
     $pass = password_hash($pass, PASSWORD_DEFAULT);
     $sql = "INSERT INTO sitoMassaggiDB.dbo.userAccount (NOME, ETA, TEL, EMAIL, PASSWORDUSER) VALUES(:name, :age, :tel, :email, :password)";
     try {
