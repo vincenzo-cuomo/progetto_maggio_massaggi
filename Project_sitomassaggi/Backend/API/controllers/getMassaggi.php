@@ -3,8 +3,7 @@ function getAllMassages()
 {
     require __DIR__ . "/../models/conf.php";
     $db = new database();
-    if ($db->dbConnect()) {
-        $db = $db->dbConnect();
+    if ($db = $db->dbConnect()) {
         $data = array();
         try {
             $sql = "SELECT * URL FROM sitoMassaggiDB.dbo.tipoMassaggio WHERE ATTIVO = :attivo";
@@ -13,7 +12,7 @@ function getAllMassages()
             $stmt->execute();
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
                 $nameMassaggio = $row['NOMEMASSAGGIO'];
-                $rowData = array("ID" => $row['IDMASSAGGIO'],"Nome" => $row['NOMEMASSAGGIO'], "Descrizione" => $row['DESCRIZIONE'], "URLImage" => $row['URL']);
+                $rowData = array("ID" => $row['IDMASSAGGIO'], "Nome" => $row['NOMEMASSAGGIO'], "Descrizione" => $row['DESCRIZIONE'], "URLImage" => $row['URL']);
                 $data[$nameMassaggio] = $rowData;
             }
         } catch (PDOException $e) {
@@ -24,7 +23,8 @@ function getAllMassages()
         }
         http_response_code(200);
         header("Content-Type: application/json");
-        echo json_encode($data);
+        header("ETag: $etag");
+        echo json_encode(["success" => True, $data]);
     } else {
         http_response_code(500);
         header("Content-Type: application/json");
@@ -33,8 +33,30 @@ function getAllMassages()
     }
 }
 
-function getMassage($id){
 
+function getMassage($id)
+{
+    $id = (array) $id;
+    $db = new database();
+    if ($db = $db->dbConnect()) {
+        $data = array();
+        try{
+            $sql = "SELECT * FROM sitoMassaggiDB.dbo.tipoMassaggio WHERE IDMASSAGGIO = :idmassaggio";
+            $stmt = $db->prepare($sql);
+            for ($i = 0; count($id) - 1; $i++) {
+                $stmt->execute([':idmassaggio' => $id[$i]]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                $rowData = array("ID" => $row['IDMASSAGGIO'], "Nome" => $row['NOMEMASSAGGIO'], "Descrizione" => $row['DESCRIZIONE'], "URLImage" => $row['URL'], "ETag" => md5(json_encode([$row['IDMASSAGGIO'], $row['NOMEMASSAGGIO'], $row['DESCRIZIONE'], $row['URL']])));
+                $data[$row['NOMEMASSAGGIO']] = $rowData;
+            }
+            http_response_code(200);
+            header("Content-Type: application/json");
+            echo json_encode(["success" => True, $data]);
+        } catch (PDOException $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["success" => false, "description" => "Non è stato possibile ricavare informazioni dal db"]);
+            exit;
+        }
+    }
 }
-
-?>

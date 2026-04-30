@@ -39,7 +39,8 @@
             "type": "library",
             "autoload": {
                 "psr-4": {
-                    "Firebase\\JWT\\": "src"
+                    "Firebase\\JWT\\": "src",
+                    "API\\": "./API"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",

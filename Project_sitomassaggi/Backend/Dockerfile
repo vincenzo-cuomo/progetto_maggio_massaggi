@@ -11,7 +11,7 @@ RUN apt-get update && apt-get install -y \
     libargon2-dev \
     nano
 
-COPY ./apache2.conf /etc/apache2/apache2.conf
+
 RUN a2enmod rewrite
 RUN sed -i 's#DocumentRoot /var/www/html#DocumentRoot /var/www/backend/public#' /etc/apache2/sites-available/000-default.conf
 RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/microsoft.gpg
@@ -22,8 +22,10 @@ RUN pecl install sqlsrv-5.13.0 pdo_sqlsrv-5.13.0 && docker-php-ext-enable sqlsrv
 
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-COPY composer.json composer.lock /var/www/backend/
-RUN composer install --no-interaction --no-dev --optimize-autoloader
+
+
+COPY ./apache2.conf /etc/apache2/apache2.conf
 COPY . /var/www/backend
+RUN composer install --no-interaction --no-dev --optimize-autoloader
 RUN chown -R www-data:www-data /var/www/backend
 RUN chmod -R 755 /var/www/backend
