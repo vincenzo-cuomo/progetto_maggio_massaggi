@@ -1,9 +1,11 @@
 <?php
 
 namespace API\Controllers;
-use API\Models\database;
 
-class Login
+use API\Models\database;
+use API\middleware\jwtCentre as jwt;
+
+class User
 {
     function verifyLogin(string $email, string $password)
     {
@@ -29,13 +31,13 @@ class Login
             $rows = $stmt->fetch(\PDO::FETCH_ASSOC);
             if ($rows) {
                 if (password_verify($password, $rows["PASSWORDUSER"])) {
-                    require __DIR__ . "/../middleware/jwtValidator.php";
+                    $jwt = new jwt;
                     $userId = $rows['IDUTENTE'];
                     $payload = ["userID" => $userId, "iat" => time(), "exp" => time() + 3600]; #jwt payload
                     http_response_code(200);
                     header("Content-Type: application/json");
                     header("Cache-Control: no-cache, private");
-                    header("Authorization: Bearer " . jwtCreator($payload));
+                    header("Authorization: Bearer " . $jwt->jwtCreate($payload));
                     echo json_encode(["success" => true]);
                 } else {
                     http_response_code(400);
@@ -54,6 +56,32 @@ class Login
             header("Content-Type: application/json");
             echo json_encode(["success" => false, "description" => "Connessione al DB fallita, riprovare più tardi"]);
             exit;
+        }
+    }
+
+    function signup(string $name, int $age, string $tel, string $email, string $password)
+    {
+        $db = new database()->dbConnect();
+        $pass = htmlspecialchars($password);
+        $pass = password_hash($pass, PASSWORD_DEFAULT);
+        try {
+            $sql = "INSERT INTO sitoMassaggiDB.dbo.userAccount (NOME, ETA, TEL, EMAIL, PASSWORDUSER) VALUES(:name, :age, :tel, :email, :password)";
+            $stmt = $db->prepare($sql);
+            $stmt->execute([':name' => $name, ':age' => $age, ':tel' => $tel, ':email' => $email, ':password' => $pass]);
+            http_response_code(200);
+            header("Content-Type: application/json");
+            echo json_encode(["success" => true, "Description" => "L'user è stato registrato correttamente"]);
+            exit;
+        } catch (\PDOException $e) {
+            if ($e->getCode() == 23000) {
+                http_response_code(400);
+                header("Content-Type: application/json");
+                echo json_encode(["success" => false, "Description" => "L'email è associata a un altro account"]);
+            } else {
+                http_response_code(400);
+                header("Content-Type: application/json");
+                echo json_encode(["success" => false, "Description" => $e]);
+            }
         }
     }
 }

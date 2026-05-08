@@ -1,4 +1,7 @@
 <?php
+require __DIR__."/../vendor/autoload.php";
+$dotenv = Dotenv\Dotenv::createImmutable(__DIR__."/../");
+$dotenv->load();
 spl_autoload_register(function ($class) {
     $class = str_replace('\\', '/', trim($class, "/"));
     require __DIR__ . "/../$class.php";
@@ -23,18 +26,25 @@ class Data
 
     public function __construct()
     {
-        $this->objData = json_decode(file_get_contents("php://input"), true);
+        $this->objData = json_decode(file_get_contents("php://input"), true) ?? [];
     }
 
     public function paramsChecking(array $params)
     {
-        foreach ($params as $field) {
-            if (!isset($this->objData[$field]) || empty($this->objData[$field])) {
-                http_response_code(400);
-                header("Content-Type: application/json");
-                echo (json_encode(["success" => false, "error" => "Not all parameters have been inserted"]));
-                exit;
+        if (!empty($this->objData)) {
+            foreach ($params as $field) {
+                if (!isset($this->objData[$field]) || empty($this->objData[$field])) {
+                    http_response_code(400);
+                    header("Content-Type: application/json");
+                    echo (json_encode(["success" => false, "error" => "Not all parameters have been inserted"]));
+                    exit;
+                }
             }
+        } else {
+            http_response_code(400);
+            header("Content-Type: application/json");
+            echo (json_encode(["success" => false, "error" => "Not all parameters have been inserted"]));
+            exit;
         }
         return true;
     }
@@ -58,16 +68,24 @@ class Router
     }
     public function dispatch(string $path)
     {
-        $method =  $_SERVER['REQUEST_METHOD'];
+       
+        $method = $_SERVER['REQUEST_METHOD'];
         $path = str_replace('\\', '/', $path);
         $path = $this->normalizePath($path);
         foreach ($this->routes as $route) {
-            if (!preg_match("#^{$route['path']}$#", $path) || $route['method'] !== $method) {continue;}
+            if (!preg_match("#^{$route['path']}$#", $path) || $route['method'] != $method) {
+                continue;
+            }
             [$class, $function] = $route['controller'];
-            
-            if (!empty( $route['params'])){$paramsChecker = new Data(); $params = $route['params']; $paramsChecker->paramsChecking($route['params']); unset($paramsChecker);}
+            if (!empty($route['params'])) {
+                $paramsChecker = new Data();
+                $params = $route['params'];
+                $paramsChecker->paramsChecking($params);
+                $params = $paramsChecker->objData;
+                unset($paramsChecker);
+            }
             $controllerClass = new $class;
-            call_user_func_array(array($controllerClass, $function), $params);
+            call_user_func_array(array($controllerClass, $function), $params ?? []);
             return;
         }
         http_response_code(404);
@@ -78,6 +96,8 @@ class Router
 }
 
 $router = new Router;
-$router->addRoute('api/users/login', 'POST', [\API\Controllers\Login::class, 'verifyLogin'], ['email', 'password']);
-$router->addRoute('api/users/signup', 'POST', [\API\Controllers\signUp::class, 'signup'], ['name', 'age', 'tel', 'email', 'password']);
+$router->addRoute('api/users/login', 'POST', [\API\Controllers\User::class, 'verifyLogin'], ['email', 'password']);
+$router->addRoute('api/users/signup', 'POST', [\API\Controllers\User::class, 'signup'], ['name', 'age', 'tel', 'email', 'password']);
+$router->addRoute('api/massages', 'GET', [\API\Controllers\Massage::class, 'getAllMassages'], []);
+$router->addRoute('api/massages/add', 'POST', [\API\Controllers\Massage::class, 'addMassage'], ['jwtToken','name', 'durmed', 'costo', 'urlImage', 'description', 'active']);
 $router->dispatch($path);
