@@ -7,30 +7,34 @@ use API\middleware\jwtCentre as jwt;
 
 class User
 {
+    private $db;
+
+    public function __construct(){
+        $database = database::getInstance();
+        $this->db = $database->getConnection();
+    }
+
     function verifyLogin(string $email, string $password)
     {
         header("Access-Control-Expose-Headers: Authorization");
-        $password = htmlspecialchars($password);
         $sql = "SELECT PASSWORDUSER, IDUTENTE, UpdatedAt FROM sitoMassaggiDB.dbo.userAccount WHERE EMAIL = :email";
 
-        $db = new database();
-
-        if ($db->dbConnect()) {
-            $db = $db->dbConnect();
+        $db = database::getInstance();
+        if ($this->db) {
             try {
-                $stmt = $db->prepare($sql);
+                $stmt = $this->db->prepare($sql);
                 $stmt->bindValue(':email', $email);
                 $stmt->execute();
             } catch (\PDOException $e) {
                 http_response_code(400);
                 header("Content-Type: application/json");
-                echo json_encode(["success" => false, "description" => "Sono state inserite una password o mail sbagliata", "error" => $e->getMessage()]);
+                echo json_encode(["success" => false, "description" => "Sono state inserite una passwordd o mail sbagliata", "error" => $e->getMessage()]);
                 exit;
             }
 
             $rows = $stmt->fetch(\PDO::FETCH_ASSOC);
             if ($rows) {
-                if (password_verify($password, $rows["PASSWORDUSER"])) {
+                if (password_verify(htmlspecialchars($password), $rows["PASSWORDUSER"])) {
                     $jwt = new jwt;
                     $userId = $rows['IDUTENTE'];
                     $payload = ["userID" => $userId, "iat" => time(), "exp" => time() + 3600]; #jwt payload
@@ -61,19 +65,19 @@ class User
 
     function signup(string $name, int $age, string $tel, string $email, string $password)
     {
-        $db = new database()->dbConnect();
-        $pass = htmlspecialchars($password);
-        $pass = password_hash($pass, PASSWORD_DEFAULT);
+        $password = htmlspecialchars($password);
+        $password = password_hash($password, PASSWORD_DEFAULT, ['cost' => 9]);
         try {
             $sql = "INSERT INTO sitoMassaggiDB.dbo.userAccount (NOME, ETA, TEL, EMAIL, PASSWORDUSER) VALUES(:name, :age, :tel, :email, :password)";
-            $stmt = $db->prepare($sql);
-            $stmt->execute([':name' => $name, ':age' => $age, ':tel' => $tel, ':email' => $email, ':password' => $pass]);
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':name' => $name, ':age' => $age, ':tel' => $tel, ':email' => $email, ':password' => $password]);
             http_response_code(200);
             header("Content-Type: application/json");
             echo json_encode(["success" => true, "Description" => "L'user è stato registrato correttamente"]);
             exit;
         } catch (\PDOException $e) {
             if ($e->getCode() == 23000) {
+                
                 http_response_code(400);
                 header("Content-Type: application/json");
                 echo json_encode(["success" => false, "Description" => "L'email è associata a un altro account"]);

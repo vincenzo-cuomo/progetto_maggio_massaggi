@@ -1,5 +1,6 @@
 FROM php:apache-bookworm
 WORKDIR /var/www/backend
+
 RUN apt-get update && apt-get install -y \
     gnupg2 \
     curl \
@@ -11,21 +12,22 @@ RUN apt-get update && apt-get install -y \
     libargon2-dev \
     nano
 
-
+RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 RUN a2enmod rewrite
-RUN sed -i 's#DocumentRoot /var/www/html#DocumentRoot /var/www/backend/public#' /etc/apache2/sites-available/000-default.conf
+COPY --from=ghcr.io/php/pie:bin /pie /usr/bin/pie
+RUN pie install xdebug/xdebug && echo "xdebug.mode = profile" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && echo "xdebug.output_dir = /tmp" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/microsoft.gpg
 RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" \
     > /etc/apt/sources.list.d/mssql-release.list
 RUN apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18
 RUN pecl install sqlsrv-5.13.0 pdo_sqlsrv-5.13.0 && docker-php-ext-enable sqlsrv pdo_sqlsrv
-
+COPY ./ServerSettings/000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY ./ServerSettings/apache2.conf /etc/apache2/apache2.conf
+COPY ./ServerSettings/enviroment.sh /usr/local/bin/environment.sh
+RUN chmod +x /usr/local/bin/environment.sh
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-
-
-COPY ./apache2.conf /etc/apache2/apache2.conf
 COPY . /var/www/backend
-RUN composer install --no-interaction --no-dev --optimize-autoloader
+RUN composer dump-autoload --optimize --classmap-authoritative
+ENTRYPOINT ["/bin/bash", "-c", "/usr/local/bin/environment.sh"]
 RUN chown -R www-data:www-data /var/www/backend
 RUN chmod -R 755 /var/www/backend

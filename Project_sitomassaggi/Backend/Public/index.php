@@ -1,12 +1,11 @@
 <?php
 require __DIR__."/../vendor/autoload.php";
-$dotenv = Dotenv\Dotenv::createImmutable(__DIR__."/../");
-$dotenv->load();
 spl_autoload_register(function ($class) {
     $class = str_replace('\\', '/', trim($class, "/"));
     require __DIR__ . "/../$class.php";
 });
 
+$data = json_decode(file_get_contents("php://input"), true);
 $path = parse_url($_SERVER["REQUEST_URI"], PHP_URL_PATH);
 $method = $_SERVER['REQUEST_METHOD'];
 header("Access-Control-Allow-Origin: *");
@@ -20,35 +19,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 }
 
 
-class Data
-{
-    public array $objData = [];
-
-    public function __construct()
-    {
-        $this->objData = json_decode(file_get_contents("php://input"), true) ?? [];
-    }
-
-    public function paramsChecking(array $params)
-    {
-        if (!empty($this->objData)) {
-            foreach ($params as $field) {
-                if (!isset($this->objData[$field]) || empty($this->objData[$field])) {
-                    http_response_code(400);
-                    header("Content-Type: application/json");
-                    echo (json_encode(["success" => false, "error" => "Not all parameters have been inserted"]));
-                    exit;
-                }
-            }
-        } else {
-            http_response_code(400);
-            header("Content-Type: application/json");
-            echo (json_encode(["success" => false, "error" => "Not all parameters have been inserted"]));
-            exit;
-        }
-        return true;
-    }
-}
 
 class Router
 {
@@ -77,15 +47,8 @@ class Router
                 continue;
             }
             [$class, $function] = $route['controller'];
-            if (!empty($route['params'])) {
-                $paramsChecker = new Data();
-                $params = $route['params'];
-                $paramsChecker->paramsChecking($params);
-                $params = $paramsChecker->objData;
-                unset($paramsChecker);
-            }
             $controllerClass = new $class;
-            call_user_func_array(array($controllerClass, $function), $params ?? []);
+            call_user_func_array(array($controllerClass, $function), json_decode(file_get_contents("php://input"), true) ?? []);
             return;
         }
         http_response_code(404);
