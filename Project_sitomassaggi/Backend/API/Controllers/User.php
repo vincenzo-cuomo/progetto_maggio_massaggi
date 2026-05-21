@@ -54,6 +54,8 @@ class User
         }
 
         if ($rows) {
+            echo json_encode($rows);
+            exit;
             if (password_verify(htmlspecialchars($password), $rows["PASSWORDUSER"])) {
                 $jwt = new jwt;
                 $userId = $rows['IDUTENTE'];
