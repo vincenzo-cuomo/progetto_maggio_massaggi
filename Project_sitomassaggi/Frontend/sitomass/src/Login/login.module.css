@@ -42,7 +42,6 @@ input:focus {
     width: 100vw;
     height: 100vh;
     overflow: hidden;
-    background-image: url("./Images/susannp4-background-1524540_1920.jpg");
     background-position:left;
 
 }
@@ -62,8 +61,6 @@ input:focus {
 .form {
     display: flex;
     flex-direction: column;
-
-
     box-sizing: border-box;
     padding-inline: var(--spacer-2);
     padding-block-start: var(--spacer-2);

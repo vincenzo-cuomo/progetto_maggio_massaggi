@@ -1,0 +1,18 @@
+.errorMessage{
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-size: large;
+    font-family: Arial, Helvetica, sans-serif;
+    border-radius: 20px;
+    padding: 5px;
+    width: clamp(150px, 100%, 400px);
+    height: 100%;
+    align-items: center;
+    background-color: black;
+    color: white;
+}

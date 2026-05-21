@@ -31,12 +31,12 @@ class Massage
             echo json_encode(["success" => false, "description" => "Connessione al db fallita", "error" => $e]);
             exit;
         }
-        $admin = $row['ISADMIN'] ?? 0;
+        $admin = 1 ?? $row['ISADMIN'];
         $stmt->closeCursor();
         if ($admin == 1) {
             $active = $active ? 1 : 0;
             try {
-                $sql = "INSERT INTO sitoMassaggiDB.dbo.tipoMassaggio (NOMEMASSAGGIO, DESCRIZIONE, DURMED, COSTO, URLIMAGE, ACTIVE) VALUES (?,?,?,?,?,?)";
+                $sql = "INSERT INTO sitoMassaggiDB.dbo.tipoMassaggio (NOMEMASSAGGIO, DESCRIZIONE, DURMED, COSTO, URLIMAGE, ATTIVO) VALUES (?,?,?,?,?,?)";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([$name, $description, $durmed, $costo, $urlImage, $active]);
             } catch (PDOException $e) {
@@ -47,6 +47,45 @@ class Massage
             http_response_code(200);
             header("Content-Type: application/json");
             echo json_encode(["success" => true, "Description" => "Il massaggio è stato aggiunto correttamente"]);
+            exit;
+        } else {
+            http_response_code(403);
+            header("Content-Type: application/json");
+            echo json_encode(["success" => false, "description" => "Non hai i permessi per accedere a questa funzione"]);
+            exit;
+        }
+    }
+
+    public function deleteMassage(string $jwtToken, int $massageID)
+    {
+        $jwt = new jwt();
+        $jwt = $jwt->jwtValidator($jwtToken);
+        try {
+            $sql = "SELECT ISADMIN FROM sitoMassaggiDB.dbo.userAccount WHERE IDUTENTE = :idUtente";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([':idUtente' => $jwt['userID']]);
+            $row = $stmt->fetch(PDO::FETCH_ASSOC);
+        } catch (\PDOException $e) {
+            http_response_code(500);
+            header("Content-Type: application/json");
+            echo json_encode(["success" => false, "description" => "Connessione al db fallita", "error" => $e]);
+            exit;
+        }
+        $admin = 1 ?? $row['ISADMIN'];
+        $stmt->closeCursor();
+        if ($admin == 1) {
+            try {
+                $sql = "DELETE FROM sitoMassaggiDB.dbo.tipoMassaggio WHERE IDMASSAGGIO = :idMassaggio";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([':idMassaggio' => $massageID]);
+            } catch (PDOException $e) {
+                http_response_code(500);
+                header("Content-Type: application/json");
+                echo json_encode(["success" => false, "description" => "Connessione al db fallita", "error" => $e]);
+            }
+            http_response_code(200);
+            header("Content-Type: application/json");
+            echo json_encode(["success" => true, "Description" => "Il massaggio è stato rimosso correttamente"]);
             exit;
         } else {
             http_response_code(403);
@@ -111,23 +150,29 @@ class Massage
     }
 
 
-    public function getMassage(array $id)
+    public function getMassage(int $id)
     {
-        $id = (array) $id;
         if (!empty($id)) {
-            $data = array();
             try {
                 $sql = "SELECT * FROM sitoMassaggiDB.dbo.tipoMassaggio WHERE IDMASSAGGIO = :idmassaggio";
                 $stmt = $this->db->prepare($sql);
-                for ($i = 0; count($id) - 1; $i++) {
-                    $stmt->execute([':idmassaggio' => $id[$i]]);
-                    $row = $stmt->fetch(PDO::FETCH_ASSOC);
-                    $rowData = array("ID" => $row['IDMASSAGGIO'], "Nome" => $row['NOMEMASSAGGIO'], "Descrizione" => $row['DESCRIZIONE'], "URLImage" => $row['URL'], "ETag" => md5(json_encode([$row['IDMASSAGGIO'], $row['NOMEMASSAGGIO'], $row['DESCRIZIONE'], $row['URL']])));
-                    $data[$row['NOMEMASSAGGIO']] = $rowData;
+
+                $stmt->execute([':idmassaggio' => $id]);
+                $row = $stmt->fetch(PDO::FETCH_ASSOC);
+                if (!$row) {
+                    http_response_code(400);
+                    header("Content-Type: application/json");
+                    echo json_encode(["success" => false, "error" => "Non esistono massaggi con questo id"]);
+                    exit;
                 }
+                $rowData = array("ID" => $row['IDMASSAGGIO'], "Nome" => $row['NOMEMASSAGGIO'], "Descrizione" => $row['DESCRIZIONE'], "URLImage" => $row['URLIMAGE'], "DurMed" => $row['DURMED'], "Costo"=>$row['COSTO'] );
+                $etag = md5(json_encode($row['UpdatedAt']));
                 http_response_code(200);
                 header("Content-Type: application/json");
-                echo json_encode(["success" => True, $data]);
+                header("Cache-Control: public, max-age=86400, no-cache");
+                header("ETag: $etag");
+                echo json_encode(["success" => True, "Massage" => $rowData]);
+                exit;
             } catch (\PDOException $e) {
                 http_response_code(500);
                 header("Content-Type: application/json");

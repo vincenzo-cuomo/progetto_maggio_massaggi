@@ -9,9 +9,31 @@ class User
 {
     private $db;
 
-    public function __construct(){
+    public function __construct()
+    {
         $database = database::getInstance();
         $this->db = $database->getConnection();
+    }
+
+    public function getUserName($jwtToken)
+    {
+        $jwt = new jwt;
+        $decoded = $jwt->jwtValidator($jwtToken);
+        $sql = "SELECT NOME FROM sitoMassaggiDB.dbo.userAccount WHERE IDUTENTE = :idutente";
+        try {
+            $stmt = $this->db->prepare($sql);
+            $stmt->bindValue(':idutente', $decoded['sub']);
+            $stmt->execute();
+        } catch (\PDOException $e) {
+            http_response_code(500);
+            echo json_encode(["error" => $e]);
+            exit;
+        }
+        $rows = $stmt->fetch(\PDO::FETCH_ASSOC);
+        http_response_code(200);
+        header("Content-Type: application/json");
+        echo json_encode(["username" => $rows["NOME"]]);
+        exit;
     }
 
     function verifyLogin(string $email, string $password)
@@ -37,7 +59,7 @@ class User
                 if (password_verify(htmlspecialchars($password), $rows["PASSWORDUSER"])) {
                     $jwt = new jwt;
                     $userId = $rows['IDUTENTE'];
-                    $payload = ["userID" => $userId, "iat" => time(), "exp" => time() + 3600]; #jwt payload
+                    $payload = ["sub" => $userId, "iat" => time(), "exp" => time() + 3600]; #jwt payload
                     http_response_code(200);
                     header("Content-Type: application/json");
                     header("Cache-Control: no-cache, private");
@@ -77,7 +99,7 @@ class User
             exit;
         } catch (\PDOException $e) {
             if ($e->getCode() == 23000) {
-                
+
                 http_response_code(400);
                 header("Content-Type: application/json");
                 echo json_encode(["success" => false, "Description" => "L'email è associata a un altro account"]);

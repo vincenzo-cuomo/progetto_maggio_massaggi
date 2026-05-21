@@ -1,7 +1,7 @@
 <?php
 
 namespace API\middleware;
-# $payload = ["userID" => $userId, "iat" => time() , "exp" => time() + 3600];
+# $payload = ["sub" => $userId, "iat" => time() , "exp" => time() + 3600];
 
 use Firebase\JWT\Key;
 use API\Models\database;
@@ -17,24 +17,6 @@ class jwtCentre
     public function __construct() {
         $database = database::getInstance();
         $this->db = $database->getConnection();
-    }
-    public function getUserName($userID)
-    {
-        $sql = "SELECT NOME FROM sitoMassaggiDB.dbo.userAccount WHERE IDUTENTE = :idutente";
-        try {
-            $stmt = $this->db->prepare($sql);
-            $stmt->bindValue(':idutente', $userID);
-            $stmt->execute();
-        } catch (\PDOException $e) {
-            http_response_code(500);
-            echo json_encode(["error" => $e]);
-            exit;
-        }
-        $rows = $stmt->fetch(\PDO::FETCH_ASSOC);
-        http_response_code(200);
-        header("Content-Type: application/json");
-        echo json_encode(["username" => $rows["NOME"]]);
-        exit;
     }
 
     public function jwtCreate(array $payload)
@@ -52,7 +34,7 @@ class jwtCentre
         }
     }
 
-    public function jwtValidator(string $jwt, bool $getUserName = false)
+    public function jwtValidator(string $jwt)
     {
 
         $jwt = trim($jwt, ' ');
@@ -66,12 +48,6 @@ class jwtCentre
             header("Content-Type: application/json");
             header('WWW-Authenticate: Bearer authorization_uri="http://localhost:3080/login"');
             echo json_encode(["error" => "Expired JWT token"]);
-            exit;
-        }
-
-
-        if ($getUserName) {
-            $this->getUserName($decoded['userId']);
             exit;
         }
         return $decoded;
