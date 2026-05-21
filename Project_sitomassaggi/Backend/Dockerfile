@@ -1,5 +1,5 @@
 FROM php:apache-bookworm
-WORKDIR /var/www/backend/public
+WORKDIR /var/www/backend
 
 RUN apt-get update && apt-get install -y \
     gnupg2 \
@@ -10,8 +10,7 @@ RUN apt-get update && apt-get install -y \
     lsb-release \
     libargon2-1 \
     libargon2-dev \
-    nano
-
+    nano 
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 RUN a2enmod rewrite
 RUN sed -i 's!/var/www/html!/var/www/backend/public!g'  /etc/apache2/sites-available/000-default.conf
@@ -22,6 +21,12 @@ RUN apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18
 RUN pecl install sqlsrv-5.13.0 pdo_sqlsrv-5.13.0 && docker-php-ext-enable sqlsrv pdo_sqlsrv
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY . /var/www/backend
+RUN composer install \
+    --no-dev \
+    --optimize-autoloader \
+    --no-interaction
+RUN composer install -vvv
+
 RUN chown -R www-data:www-data /var/www/backend
 RUN chmod -R 755 /var/www/backend
 
