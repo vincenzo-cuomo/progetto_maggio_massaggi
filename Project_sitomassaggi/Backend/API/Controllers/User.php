@@ -54,11 +54,9 @@ class User
         }
 
         if ($rows) {
-            echo json_encode($rows);
-            exit;
-            if (password_verify(htmlspecialchars($password), $rows["PASSWORDUSER"])) {
+            if (password_verify(htmlspecialchars($password), $rows["passworduser"])) {
                 $jwt = new jwt;
-                $userId = $rows['IDUTENTE'];
+                $userId = $rows['idutente'];
                 $payload = ["sub" => $userId, "iat" => time(), "exp" => time() + 3600]; #jwt payload
                 http_response_code(200);
                 header("Content-Type: application/json");
