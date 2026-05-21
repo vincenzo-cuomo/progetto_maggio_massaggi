@@ -69,7 +69,7 @@ class Router
         }
         http_response_code(404);
         header("Content-Type: application/json");
-        echo json_encode(["Error" => "Unable to find path"]);
+        echo json_encode(["Error" => "Unable to find path "]);
         exit;
     }
 }
