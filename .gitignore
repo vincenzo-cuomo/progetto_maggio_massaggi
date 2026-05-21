@@ -2,10 +2,8 @@
 *.yml
 *.env
 .env*
-*.sh
 db/
 node_modules/
 !vendor/
 !package-lock.json
 !package.json
-/ServerSettings
