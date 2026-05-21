@@ -16,7 +16,7 @@ RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
 RUN a2enmod rewrite
 COPY --from=ghcr.io/php/pie:bin /pie /usr/bin/pie
 RUN pie install xdebug/xdebug && echo "xdebug.mode = profile" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && echo "xdebug.output_dir = /tmp" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN sed -i 's!/var/www/html!/var/www/backend!g'  /etc/apache2/sites-available/000-default.conf
+RUN sed -i 's!/var/www/html!/var/www/backend/public!g'  /etc/apache2/sites-available/000-default.conf
 RUN curl -sSL https://packages.microsoft.com/keys/microsoft.asc | gpg --dearmor > /usr/share/keyrings/microsoft.gpg
 RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://packages.microsoft.com/debian/12/prod bookworm main" \
     > /etc/apt/sources.list.d/mssql-release.list
