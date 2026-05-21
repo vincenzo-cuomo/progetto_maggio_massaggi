@@ -19,7 +19,7 @@ class User
     {
         $jwt = new jwt;
         $decoded = $jwt->jwtValidator($jwtToken);
-        $sql = "SELECT NOME FROM sitoMassaggiDB.dbo.userAccount WHERE IDUTENTE = :idutente";
+        $sql = "SELECT NOME FROM userAccount WHERE IDUTENTE = :idutente";
         try {
             $stmt = $this->db->prepare($sql);
             $stmt->bindValue(':idutente', $decoded['sub']);
@@ -39,7 +39,7 @@ class User
     function verifyLogin(string $email, string $password)
     {
         header("Access-Control-Expose-Headers: Authorization");
-        $sql = "SELECT PASSWORDUSER, IDUTENTE, UpdatedAt FROM sitoMassaggiDB.dbo.userAccount WHERE EMAIL = :email";
+        $sql = "SELECT PASSWORDUSER, IDUTENTE, UpdatedAt FROM userAccount WHERE EMAIL = :email";
 
         $db = database::getInstance();
         if ($this->db) {
@@ -90,7 +90,7 @@ class User
         $password = htmlspecialchars($password);
         $password = password_hash($password, PASSWORD_DEFAULT, ['cost' => 9]);
         try {
-            $sql = "INSERT INTO sitoMassaggiDB.dbo.userAccount (NOME, ETA, TEL, EMAIL, PASSWORDUSER) VALUES(:name, :age, :tel, :email, :password)";
+            $sql = "INSERT INTO userAccount (NOME, ETA, TEL, EMAIL, PASSWORDUSER) VALUES(:name, :age, :tel, :email, :password)";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':name' => $name, ':age' => $age, ':tel' => $tel, ':email' => $email, ':password' => $password]);
             http_response_code(200);

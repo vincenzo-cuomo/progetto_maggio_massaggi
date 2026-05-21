@@ -21,7 +21,7 @@ class Massage
         $jwt = new jwt();
         $jwt = $jwt->jwtValidator($jwtToken);
         try {
-            $sql = "SELECT ISADMIN FROM sitoMassaggiDB.userAccount WHERE IDUTENTE = :idUtente";
+            $sql = "SELECT ISADMIN FROM userAccount WHERE IDUTENTE = :idUtente";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':idUtente' => $jwt['userID']]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -35,7 +35,7 @@ class Massage
         $stmt->closeCursor();
         if ($admin == true) {
             try {
-                $sql = "INSERT INTO sitoMassaggiDB.tipoMassaggio (NOMEMASSAGGIO, DESCRIZIONE, DURMED, COSTO, URLIMAGE, ATTIVO) VALUES (?,?,?,?,?,?)";
+                $sql = "INSERT INTO tipoMassaggio (NOMEMASSAGGIO, DESCRIZIONE, DURMED, COSTO, URLIMAGE, ATTIVO) VALUES (?,?,?,?,?,?)";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([$name, $description, $durmed, $costo, $urlImage, $active]);
             } catch (PDOException $e) {
@@ -60,7 +60,7 @@ class Massage
         $jwt = new jwt();
         $jwt = $jwt->jwtValidator($jwtToken);
         try {
-            $sql = "SELECT ISADMIN FROM sitoMassaggiDB.dbo.userAccount WHERE IDUTENTE = :idUtente";
+            $sql = "SELECT ISADMIN FROM userAccount WHERE IDUTENTE = :idUtente";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':idUtente' => $jwt['userID']]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -74,7 +74,7 @@ class Massage
         $stmt->closeCursor();
         if ($admin == 1) {
             try {
-                $sql = "DELETE FROM sitoMassaggiDB.dbo.tipoMassaggio WHERE IDMASSAGGIO = :idMassaggio";
+                $sql = "DELETE FROM tipoMassaggio WHERE IDMASSAGGIO = :idMassaggio";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([':idMassaggio' => $massageID]);
             } catch (PDOException $e) {
@@ -100,7 +100,7 @@ class Massage
         if (!empty(apache_request_headers()['If-None-Match'])) {
             $requestEtag = apache_request_headers()['If-None-Match'];
             try {
-                $sql = "SELECT MAX(UpdatedAt) FROM sitoMassaggiDB.dbo.tipoMassaggio WHERE ATTIVO = :attivo";
+                $sql = "SELECT MAX(UpdatedAt) FROM tipoMassaggio WHERE ATTIVO = :attivo";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([":attivo" => 1]);
             } catch (\PDOException $e) {
@@ -120,7 +120,7 @@ class Massage
         }
         $data = [];
         try {
-            $sql = "SELECT * FROM sitoMassaggiDB.dbo.tipoMassaggio WHERE ATTIVO = :attivo";
+            $sql = "SELECT * FROM tipoMassaggio WHERE ATTIVO = :attivo";
             $stmt = $this->db->prepare($sql, array(PDO::ATTR_CURSOR => PDO::CURSOR_SCROLL));
             $stmt->bindValue(":attivo", 1);
             $stmt->execute();
@@ -151,7 +151,7 @@ class Massage
     {
         if (!empty($id)) {
             try {
-                $sql = "SELECT * FROM sitoMassaggiDB.dbo.tipoMassaggio WHERE IDMASSAGGIO = :idmassaggio";
+                $sql = "SELECT * FROM tipoMassaggio WHERE IDMASSAGGIO = :idmassaggio";
                 $stmt = $this->db->prepare($sql);
 
                 $stmt->execute([':idmassaggio' => $id]);
