@@ -7,10 +7,10 @@ class database extends \PDO
 
     function __construct()
     {
-        $serverName = $_SERVER['DB_SERVER'] ?? '';
-        $database = $_SERVER['DB_NAME'] ?? '';
-        $username = $_SERVER['DB_USER'] ?? '';
-        $password = $_SERVER['DB_PASSWORD'] ?? '';
+        $serverName = getenv('DB_SERVER');
+        $database = getenv('DB_NAME');
+        $username = getenv('DB_USER');
+        $password = getenv('DB_PASSWORD');
         try {
             $this->conn = $this->connect("sqlsrv:Server=$serverName;Database=$database;TrustServerCertificate=true;", $username, $password);
         } catch (\PDOException $e) {

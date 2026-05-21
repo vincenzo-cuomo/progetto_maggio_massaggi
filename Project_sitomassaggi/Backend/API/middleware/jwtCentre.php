@@ -21,7 +21,7 @@ class jwtCentre
 
     public function jwtCreate(array $payload)
     {
-        $key = $_SERVER['JWT_KEY'];
+        $key = getenv('JWT_KEY');
         try {
 
             $jwt = JWT::encode($payload, $key, 'HS256');
@@ -38,7 +38,7 @@ class jwtCentre
     {
 
         $jwt = trim($jwt, ' ');
-        $key = $_SERVER['JWT_KEY'];
+        $key =  getenv('JWT_KEY');
 
         try {
             $decoded = JWT::decode($jwt, new Key($key, 'HS256'));
