@@ -16,7 +16,8 @@ class database extends \PDO
         $username = getenv('DB_USER');
         $password = getenv('DB_PASSWORD');
         try {
-            $this->conn= new PDO("pgsql:host=$serverName;port=17864;dbname=$database;user=$username;password=$password;sslmode=verify-ca;sslrootcert=./ca.pem");
+            $cert = __DIR__ . "/ca.pem";
+            $this->conn= new PDO("pgsql:host=$serverName;port=17864;dbname=$database;user=$username;password=$password;sslmode=verify-ca;sslrootcert=$cert");
             $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
             http_response_code(500);
