@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y \
     nano
 
 RUN cp /usr/local/etc/php/php.ini-production /usr/local/etc/php/php.ini
+RUN sed -i 's!/var/www/html!/var/www/backend!g'  /etc/apache2/sites-available/000-default.conf
 RUN a2enmod rewrite
 COPY --from=ghcr.io/php/pie:bin /pie /usr/bin/pie
 RUN pie install xdebug/xdebug && echo "xdebug.mode = profile" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini && echo "xdebug.output_dir = /tmp" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
