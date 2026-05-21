@@ -19,7 +19,7 @@ class database extends \PDO
             $cert = getenv("CA_CERT");
             $path = "/tmp/ca.pem";
             file_put_contents($path, $cert);
-            $this->conn = new PDO("pgsql:host=$serverName;port=17864;dbname=$database;sslmode=verify-ca;sslrootcert=$path;");
+            $this->conn = new PDO("pgsql:host=$serverName;port=17864;dbname=$database;sslmode=verify-ca;sslrootcert=$path;", $username, $password);
             $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
             http_response_code(500);
