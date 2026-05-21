@@ -16,10 +16,10 @@ class database extends \PDO
         $username = getenv('DB_USER');
         $password = getenv('DB_PASSWORD');
         try {
-            var_dump(file_exists('/etc/secrets/ca.pem'));
-            var_dump(is_readable('/etc/secrets/ca.pem'));
-            exit;
-            $this->conn = new PDO("pgsql:host=$serverName;port=17864;dbname=$database;sslmode=verify-ca;sslrootcert=/etc/secrets/ca.pem");
+            $cert = getenv("CA_CERT");
+            $path = "/tmp/ca.pem";
+            file_put_contents($path, $cert);
+            $this->conn = new PDO("pgsql:host=$serverName;port=17864;dbname=$database;sslmode=verify-ca;sslrootcert=$path;");
             $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
             http_response_code(500);
