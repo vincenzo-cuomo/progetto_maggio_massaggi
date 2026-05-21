@@ -17,7 +17,7 @@ export default function Homepage() {
     const [isLogged, setIsLogged] = useState(false)
     const [username, setUsername] = useState("")
     const [massages, setMassage] = useState({})
-    const [error, hasError] = useState(true)
+    const [error, hasError] = useState(false)
     const navigate = useNavigate()
 
 
