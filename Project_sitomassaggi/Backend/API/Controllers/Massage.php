@@ -62,7 +62,7 @@ class Massage
         try {
             $sql = "SELECT ISADMIN FROM userAccount WHERE IDUTENTE = :idUtente";
             $stmt = $this->db->prepare($sql);
-            $stmt->execute([':idUtente' => $jwt['userID']]);
+            $stmt->execute([':idUtente' => $jwt['userid']]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             http_response_code(500);
@@ -70,7 +70,7 @@ class Massage
             echo json_encode(["success" => false, "description" => "Connessione al db fallita", "error" => $e]);
             exit;
         }
-        $admin = 1 ?? $row['ISADMIN'];
+        $admin = 1 ?? $row['isadmin'];
         $stmt->closeCursor();
         if ($admin == 1) {
             try {
@@ -110,7 +110,7 @@ class Massage
                 exit;
             }
             $rows = $stmt->fetch(PDO::FETCH_ASSOC) ?? [];
-            $dbEtag = md5(json_encode($rows['UpdatedAt'])) ?? '';
+            $dbEtag = md5(json_encode($rows['updatedat'])) ?? '';
             if ($dbEtag == $requestEtag) {
                 http_response_code(304);
                 header("ETag: $dbEtag");
@@ -128,7 +128,7 @@ class Massage
             while ($row = $stmt->fetch(PDO::FETCH_ASSOC, PDO::FETCH_ORI_NEXT)) {
                 $nameMassaggio = $row['NOMEMASSAGGIO'];
                 $etag[] = $row['UpdatedAt'];
-                $rowData = array("ID" => $row['IDMASSAGGIO'], "Nome" => $row['NOMEMASSAGGIO'], "Descrizione" => $row['DESCRIZIONE'], "URLImage" => $row["URLIMAGE"]);
+                $rowData = array("ID" => $row['idmassaggio'], "Nome" => $row['nomemassaggio'], "Descrizione" => $row['descrizione'], "URLImage" => $row["urlimage"]);
                 $data[$nameMassaggio] = $rowData;
             }
             $etag = md5(json_encode($etag));
@@ -162,8 +162,8 @@ class Massage
                     echo json_encode(["success" => false, "error" => "Non esistono massaggi con questo id"]);
                     exit;
                 }
-                $rowData = array("ID" => $row['IDMASSAGGIO'], "Nome" => $row['NOMEMASSAGGIO'], "Descrizione" => $row['DESCRIZIONE'], "URLImage" => $row['URLIMAGE'], "DurMed" => $row['DURMED'], "Costo"=>$row['COSTO'] );
-                $etag = md5(json_encode($row['UpdatedAt']));
+                $rowData = array("ID" => $row['idmassaggio'], "Nome" => $row['nomemassaggio'], "Descrizione" => $row['descrizione'], "URLImage" => $row['urlimage'], "DurMed" => $row['durmed'], "Costo"=>$row['costo'] );
+                $etag = md5(json_encode($row['updatedat']));
                 http_response_code(200);
                 header("Content-Type: application/json");
                 header("Cache-Control: public, max-age=86400, no-cache");
