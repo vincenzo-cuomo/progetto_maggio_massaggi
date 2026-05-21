@@ -24,6 +24,5 @@ RUN pecl install sqlsrv-5.13.0 pdo_sqlsrv-5.13.0 && docker-php-ext-enable sqlsrv
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY . /var/www/backend
 RUN composer dump-autoload --optimize --classmap-authoritative
-ENTRYPOINT ["/bin/bash", "-c", "/usr/local/bin/environment.sh"]
 RUN chown -R www-data:www-data /var/www/backend
 RUN chmod -R 755 /var/www/backend
