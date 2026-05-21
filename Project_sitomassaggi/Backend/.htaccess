@@ -1,6 +1,0 @@
-<Directory /var/www/backend/public>
-	DirectoryIndex index.php
-	Options -Indexes +FollowSymLinks
-	AllowOverride all
-	Require all granted
-</Directory>
