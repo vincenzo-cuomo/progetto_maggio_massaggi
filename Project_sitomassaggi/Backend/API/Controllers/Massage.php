@@ -21,7 +21,7 @@ class Massage
         $jwt = new jwt();
         $jwt = $jwt->jwtValidator($jwtToken);
         try {
-            $sql = "SELECT ISADMIN FROM sitoMassaggiDB.dbo.userAccount WHERE IDUTENTE = :idUtente";
+            $sql = "SELECT ISADMIN FROM sitoMassaggiDB.userAccount WHERE IDUTENTE = :idUtente";
             $stmt = $this->db->prepare($sql);
             $stmt->execute([':idUtente' => $jwt['userID']]);
             $row = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -31,12 +31,11 @@ class Massage
             echo json_encode(["success" => false, "description" => "Connessione al db fallita", "error" => $e]);
             exit;
         }
-        $admin = 1 ?? $row['ISADMIN'];
+        $admin = $row['ISADMIN'];
         $stmt->closeCursor();
-        if ($admin == 1) {
-            $active = $active ? 1 : 0;
+        if ($admin == true) {
             try {
-                $sql = "INSERT INTO sitoMassaggiDB.dbo.tipoMassaggio (NOMEMASSAGGIO, DESCRIZIONE, DURMED, COSTO, URLIMAGE, ATTIVO) VALUES (?,?,?,?,?,?)";
+                $sql = "INSERT INTO sitoMassaggiDB.tipoMassaggio (NOMEMASSAGGIO, DESCRIZIONE, DURMED, COSTO, URLIMAGE, ATTIVO) VALUES (?,?,?,?,?,?)";
                 $stmt = $this->db->prepare($sql);
                 $stmt->execute([$name, $description, $durmed, $costo, $urlImage, $active]);
             } catch (PDOException $e) {

@@ -98,7 +98,7 @@ class User
             echo json_encode(["success" => true, "Description" => "L'user è stato registrato correttamente"]);
             exit;
         } catch (\PDOException $e) {
-            if ($e->getCode() == 23000) {
+            if ($e->getCode() == 23505) {
 
                 http_response_code(400);
                 header("Content-Type: application/json");
