@@ -63,7 +63,9 @@ export default function Homepage() {
     useEffect(() => {
         async function fetchMassages() {
             const res = await getAllMassages()
+            console.log(res)
             res ? setMassage(res.massages) : hasError(true)
+            console.log(massages)
         }
         fetchMassages()
     }, [])
