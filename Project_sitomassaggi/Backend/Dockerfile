@@ -1,5 +1,5 @@
 FROM php:apache-bookworm
-WORKDIR /var/www/backend
+WORKDIR /var/www/backend/public
 
 RUN apt-get update && apt-get install -y \
     gnupg2 \
