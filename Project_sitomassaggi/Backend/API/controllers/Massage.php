@@ -98,8 +98,6 @@ class Massage
 
     public function getAllMassages()
     {
-
-
         if (!empty(apache_request_headers()['If-None-Match'])) {
             $requestEtag = apache_request_headers()['If-None-Match'];
             try {
