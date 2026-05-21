@@ -1,5 +1,7 @@
 <?php
+
 namespace API\Models;
+
 class database extends \PDO
 {
     private static $istanza;
@@ -12,23 +14,26 @@ class database extends \PDO
         $username = getenv('DB_USER');
         $password = getenv('DB_PASSWORD');
         try {
+            $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $this->conn = $this->connect("pgsql:host=$serverName;port=17864;dbname=$database;user=$username;password=$password;sslmode=verify-ca;sslrootcert=./ca.pem", $username, $password);
         } catch (\PDOException $e) {
             http_response_code(500);
             header("Content-Type: application/json");
-            echo json_encode(["success" => false, "description" => "Connessione al DB fallita, riprovare più tardi", $e]);
+            echo json_encode(["success" => false, "description" => "Connessione al DB fallita, riprovare più tardi", "error"=>$e]);
             exit;
         }
     }
 
-    public static function getInstance(): static {
+    public static function getInstance(): static
+    {
         if (self::$istanza == null) {
             self::$istanza = new database();
         }
         return self::$istanza;
     }
 
-    public function getConnection(){
+    public function getConnection()
+    {
         return $this->conn;
     }
 }
