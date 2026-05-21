@@ -2,7 +2,7 @@ import { createBrowserRouter, redirect } from "react-router-dom"
 import Login from "./Login/login"
 import Homepage from "./Homepage/homepage"
 import MassagePage from "./Massage/massagepage"
-let server = "http://localhost:8080"
+let server = "https://progetto-maggio-massaggi.onrender.com"
 
 const router = createBrowserRouter([
   {
