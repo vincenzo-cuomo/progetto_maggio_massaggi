@@ -31,7 +31,7 @@ class Massage
             echo json_encode(["success" => false, "description" => "Connessione al db fallita", "error" => $e]);
             exit;
         }
-        $admin = $row['ISADMIN'];
+        $admin = true ?? $row['ISADMIN'] ;
         $stmt->closeCursor();
         if ($admin == true) {
             try {
