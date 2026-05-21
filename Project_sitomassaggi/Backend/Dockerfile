@@ -21,10 +21,6 @@ RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/microsoft.gpg] https://p
     > /etc/apt/sources.list.d/mssql-release.list
 RUN apt-get update && ACCEPT_EULA=Y apt-get install -y msodbcsql18
 RUN pecl install sqlsrv-5.13.0 pdo_sqlsrv-5.13.0 && docker-php-ext-enable sqlsrv pdo_sqlsrv
-COPY ./ServerSettings/000-default.conf /etc/apache2/sites-available/000-default.conf
-COPY ./ServerSettings/apache2.conf /etc/apache2/apache2.conf
-COPY ./ServerSettings/enviroment.sh /usr/local/bin/environment.sh
-RUN chmod +x /usr/local/bin/environment.sh
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY . /var/www/backend
 RUN composer dump-autoload --optimize --classmap-authoritative
