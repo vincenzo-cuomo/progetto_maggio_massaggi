@@ -59,7 +59,7 @@ class Router
                 $parametri = array_merge($parametri, $body);
                 [$class, $function] = $route['controller'];
                 $controllerClass = new $class;
-                call_user_func_array(array($controllerClass, $function), $valoriParametriPath);
+                call_user_func_array(array($controllerClass, $function), $parametri);
             
                 return;
             } else {
