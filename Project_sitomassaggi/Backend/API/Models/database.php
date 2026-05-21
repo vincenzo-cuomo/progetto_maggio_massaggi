@@ -16,12 +16,14 @@ class database extends \PDO
         $username = getenv('DB_USER');
         $password = getenv('DB_PASSWORD');
         try {
-            $this->conn= new PDO("pgsql:host=$serverName;port=17864;dbname=$database;user=$username;password=$password;sslmode=verify-ca;sslrootcert=/API/Models/ca.pem");
+            var_dump($serverName);
+            exit;
+            $this->conn = new PDO("pgsql:host=$serverName;port=17864;dbname=$database;sslmode=verify-ca;sslrootcert=/var/www/backend/API/Models/ca.pem");
             $this->conn->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
             http_response_code(500);
             header("Content-Type: application/json");
-            echo json_encode(["success" => false, "description" => "Connessione al DB fallita, riprovare più tardi", "error"=>$e->getMessage()]);
+            echo json_encode(["success" => false, "description" => "Connessione al DB fallita, riprovare più tardi", "error" => $e->getMessage()]);
             exit;
         }
     }
