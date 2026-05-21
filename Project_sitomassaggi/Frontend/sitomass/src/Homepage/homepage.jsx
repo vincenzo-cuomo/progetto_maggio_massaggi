@@ -24,7 +24,7 @@ export default function Homepage() {
     async function checkDBJWT() {
         if (localStorage.getItem("JWT")) {
             try {
-                const dbfetch = await fetch("http://localhost:8080/api/users/JWTvalidation", { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: localStorage.getItem("JWT") }) })
+                const dbfetch = await fetch("https://progetto-maggio-massaggi.onrender.com/api/users/JWTvalidation", { method: "POST", headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token: localStorage.getItem("JWT") }) })
                 const res = await dbfetch.json()
                 if (dbfetch.status === 200) {
                     setUsername(res.username)
@@ -45,7 +45,7 @@ export default function Homepage() {
 
     async function getAllMassages() {
         try {
-            const dbFetch = await fetch("http://localhost:8080/api/massages", { method: "GET" }).then(function (response) {
+            const dbFetch = await fetch("https://progetto-maggio-massaggi.onrender.com/api/massages", { method: "GET" }).then(function (response) {
                 if (!response.ok) {
                     hasError(true)
                     return false
